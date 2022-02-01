@@ -8,15 +8,16 @@ import lombok.Data;
 public class ParkingSpace {
     private int id;
     private String code;
-    private int occupied;
+    private String occupied;
 
     public ParkingSpace(int id, String code) {
         this.id = id;
         this.code = code;
+        occupied = "";
     }
 
     @Override
     public String toString() {
-        return code + "   " + (occupied==0 ? "(   )" : "( + )");
+        return code + "   " + (occupied.isBlank() ? "(   )" : "( " + occupied.strip() + " )");
     }
 }

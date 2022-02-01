@@ -11,9 +11,8 @@ import main.data.Car;
 import main.data.ParkingSpace;
 import main.data.User;
 
-import main.utils.services.ParkingSpaceService;
-import main.utils.services.ServiceFactory;
-import main.utils.services.UserService;
+import main.model.ParkingData;
+import main.utils.services.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +23,9 @@ public class View {
 
     private ListView<ParkingSpace> spaceListView;
     private ListView<Car> carListView;
+    private ListView<ParkingSpace> mySpacesListView;
+    private ListView<Car> registeredCarListView;
+    private ListView<ParkingSpace> freeSpacesView;
 
     private TableView<User> userTableForAdmin;
 
@@ -33,7 +35,27 @@ public class View {
         updateSpaceListView();
         updateUserTableForAdmin();
         updateCarListView();
+        updateMySpacesListView();
+        updateRegisteredCarsListView();
+        updateFreeSpacesListView();
         clearAllTextFields();
+    }
+
+    private void updateFreeSpacesListView() {
+        ParkingSpaceService service = (ParkingSpaceService) ServiceFactory.getService(ParkingSpace.class);
+        freeSpacesView.setItems(FXCollections.observableList(service.findFree()));
+    }
+
+    private void updateRegisteredCarsListView() {
+        int id = ParkingData.getInstance().getUser().getId();
+        AbstractService service = ServiceFactory.getService(Car.class);
+        registeredCarListView.setItems(FXCollections.observableList(service.findByFK(id)));
+    }
+
+    private void updateMySpacesListView() {
+        int id = ParkingData.getInstance().getUser().getId();
+        ParkingSpaceService service = (ParkingSpaceService) ServiceFactory.getService(ParkingSpace.class);
+        mySpacesListView.setItems(FXCollections.observableList(Objects.requireNonNull(service).findByUserId(id)));
     }
 
     public void addTextFields(TextField... tf) {
@@ -62,5 +84,4 @@ public class View {
             carListView.setItems(FXCollections.observableList(Objects.requireNonNull(ServiceFactory.getService(Car.class)).findByFK(user.getId())));
         }
     }
-
 }

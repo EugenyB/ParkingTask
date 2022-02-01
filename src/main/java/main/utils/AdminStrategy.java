@@ -12,7 +12,6 @@ public class AdminStrategy implements TabShowStrategy {
 
     @Override
     public void fillTabs(View view) {
-        // todo fill All tabs
         view.update();
     }
 }

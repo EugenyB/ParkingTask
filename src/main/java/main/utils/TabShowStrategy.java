@@ -7,5 +7,7 @@ import java.util.Set;
 public interface TabShowStrategy {
     Set<String> tabNames();
 
-    void fillTabs(View view);
+    default void fillTabs(View view) {
+        view.update();
+    }
 }

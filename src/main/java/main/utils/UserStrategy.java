@@ -11,8 +11,4 @@ public class UserStrategy implements TabShowStrategy {
         return Set.of("opTab");
     }
 
-    @Override
-    public void fillTabs(View view) {
-        // todo fill user tab
-    }
 }

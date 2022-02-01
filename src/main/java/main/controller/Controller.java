@@ -5,8 +5,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import main.data.Car;
+import main.data.ParkingOrder;
 import main.data.ParkingSpace;
 import main.data.User;
+import main.model.ParkingData;
 import main.utils.services.*;
 import main.utils.StrategyFactory;
 import main.view.View;
@@ -16,6 +18,16 @@ import java.util.Optional;
 import java.util.Set;
 
 public class Controller {
+    @FXML
+    private ListView<Car> registeredCarListView;
+    @FXML
+    private ListView<ParkingSpace> freeSpacesListView;
+    @FXML
+    private ListView<ParkingSpace> mySpacesListView;
+    @FXML
+    private TableView<ParkingOrder> myOrdersTableView;
+    @FXML
+    private Label userLabel;
     @FXML
     private TextField markField;
     @FXML
@@ -66,6 +78,9 @@ public class Controller {
         view.setSpaceListView(spacesListView);
         view.setUserTableForAdmin(userTableForAdmin);
         view.setCarListView(carListView);
+        view.setMySpacesListView(mySpacesListView);
+        view.setRegisteredCarListView(registeredCarListView);
+        view.setFreeSpacesView(freeSpacesListView);
         userIdColForAdmin.setCellValueFactory(new PropertyValueFactory<>("id"));
         userNameColForAdmin.setCellValueFactory(new PropertyValueFactory<>("name"));
         userLoginColForAdmin.setCellValueFactory(new PropertyValueFactory<>("login"));
@@ -81,6 +96,8 @@ public class Controller {
         Optional<User> optionalUser = loginService.login(loginField.getText().trim(), passwordField.getText().trim());
         if (optionalUser.isEmpty()) return;
         user = optionalUser.get();
+        userLabel.setText("User: " + user.getName());
+        ParkingData.getInstance().setUser(user);
         showTabs(StrategyFactory.getTabShowStrategy(user).tabNames());
     }
 
@@ -151,5 +168,10 @@ public class Controller {
             ServiceFactory.getService(Car.class).delete(selectedCar);
             view.update();
         }
+    }
+
+    public void clearUserSelection() {
+        userTableForAdmin.getSelectionModel().clearSelection();
+        view.update();
     }
 }

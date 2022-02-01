@@ -13,24 +13,37 @@ import java.util.List;
 public class ParkingSpaceService extends AbstractService {
 
     private final String FIND_ALL_PLACES = "select * from parking_space";
-    private final String FIND_FREE_PLACES = "select * from parking_space where occupied=0";
+    private final String FIND_FREE_PLACES = "select * from parking_space where occupied is null or LENGTH(occupied)=0";
     private final String ADD_CODE = "insert into parking_space (code) values (?)";
     private final String FIND_BY_ID = "select * from parking_space where id = ? limit 1";
+    private final String FIND_BY_USER_ID = "select * from parking_space p\n" +
+            "    left join car c on occupied = c.regno\n" +
+            "    left join user u on u.id = c.user_id\n" +
+            "where LENGTH(occupied)>0 and u.id = ?";
 
-    private List<ParkingSpace> findByQuery(String query) {
+    private List<ParkingSpace> findByQuery(String query, int...params) {
         List<ParkingSpace> result = new ArrayList<>();
         try {
             Connection connection = DataBaseManager.getInstance().getConnection();
             PreparedStatement ps = connection.prepareStatement(query);
+            if (params.length > 0) {
+                for (int i = 0; i < params.length; i++) {
+                    ps.setInt(1+i, params[i]);
+                }
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String code = rs.getString("code");
-                int occupied = rs.getInt("occupied");
+                String occupied = rs.getString("occupied");
                 result.add(new ParkingSpace(id, code, occupied));
             }
         } catch (SQLException ignored) {}
         return result;
+    }
+
+    public List<ParkingSpace> findByUserId(int userId) {
+        return findByQuery(FIND_BY_USER_ID, userId);
     }
 
     public List<ParkingSpace> findAll() {
@@ -52,7 +65,7 @@ public class ParkingSpaceService extends AbstractService {
     }
 
     public boolean removeIfItPossible(ParkingSpace parkingSpace) {
-        if (parkingSpace.getOccupied() == 0) {
+        if (parkingSpace.getOccupied().isBlank()) {
             try (PreparedStatement ps = DataBaseManager.getInstance().getConnection().prepareStatement("delete from parking_space where id = ?")) {
                 ps.setInt(1, parkingSpace.getId());
                 ps.executeUpdate();
@@ -72,7 +85,7 @@ public class ParkingSpaceService extends AbstractService {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 String code = rs.getString("code");
-                int occupied = rs.getInt("occupied");
+                String occupied = rs.getString("occupied");
                 return new ParkingSpace(pId, code, occupied);
             } else return null;
         } catch (SQLException e) {
