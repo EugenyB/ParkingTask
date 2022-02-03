@@ -1,4 +1,4 @@
-package main.utils;
+package main.model.utils.services.tabstrategy;
 
 import main.view.View;
 

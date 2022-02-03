@@ -1,7 +1,7 @@
-package main.utils.services;
+package main.model.utils.services.data;
 
-import main.data.ParkingSpace;
-import main.utils.DataBaseManager;
+import main.model.data.ParkingSpace;
+import main.model.utils.DataBaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +16,7 @@ public class ParkingSpaceService extends AbstractService {
     private final String FIND_FREE_PLACES = "select * from parking_space where occupied is null or LENGTH(occupied)=0";
     private final String ADD_CODE = "insert into parking_space (code) values (?)";
     private final String FIND_BY_ID = "select * from parking_space where id = ? limit 1";
+    private final String SET_OCCUPIED = "update parking_space set occupied = ? where id = ?";
     private final String FIND_BY_USER_ID = "select * from parking_space p\n" +
             "    left join car c on occupied = c.regno\n" +
             "    left join user u on u.id = c.user_id\n" +
@@ -65,7 +66,7 @@ public class ParkingSpaceService extends AbstractService {
     }
 
     public boolean removeIfItPossible(ParkingSpace parkingSpace) {
-        if (parkingSpace.getOccupied().isBlank()) {
+        if (parkingSpace.getOccupied() == null || parkingSpace.getOccupied().isBlank()) {
             try (PreparedStatement ps = DataBaseManager.getInstance().getConnection().prepareStatement("delete from parking_space where id = ?")) {
                 ps.setInt(1, parkingSpace.getId());
                 ps.executeUpdate();
@@ -103,5 +104,18 @@ public class ParkingSpaceService extends AbstractService {
     public void delete(Object o) {
         ParkingSpace ps = (ParkingSpace) o;
         removeIfItPossible(ps);
+    }
+
+    @Override
+    public boolean update(Object o) {
+        ParkingSpace p = (ParkingSpace) o;
+        try (PreparedStatement ps = DataBaseManager.getInstance().getConnection().prepareStatement(SET_OCCUPIED)) {
+            ps.setString(1, p.getOccupied());
+            ps.setInt(2, p.getId());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }

@@ -1,8 +1,5 @@
-package main.utils;
+package main.model.utils.services.tabstrategy;
 
-import main.view.View;
-
-import java.util.List;
 import java.util.Set;
 
 public class UserStrategy implements TabShowStrategy {

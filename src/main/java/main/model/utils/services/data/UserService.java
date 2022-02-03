@@ -1,7 +1,7 @@
-package main.utils.services;
+package main.model.utils.services.data;
 
-import main.data.User;
-import main.utils.DataBaseManager;
+import main.model.data.User;
+import main.model.utils.DataBaseManager;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +14,7 @@ public class UserService extends AbstractService {
     private static final String FIND_ALL = "select * from user";
     private static final String DELETE_USER = "delete from user where id = ?";
     private static final String FIND_BY_ID = "select * from user where id = ? limit 1";
+    private static final String UPDATE_USER = "update user set name = ?, login = ?, password = ?, likes = ?, admin = ? where id = ?";
 
     @Override
     public List<User> findAll() {
@@ -85,5 +86,22 @@ public class UserService extends AbstractService {
     public void delete(Object o) {
         User user = (User) o;
         deleteUserIfItPossible(user);
+    }
+
+    @Override
+    public boolean update(Object o) {
+        User user = (User) o;
+        try (PreparedStatement ps = DataBaseManager.getInstance().getConnection().prepareStatement(UPDATE_USER)) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getPassword());
+            ps.setInt(4, user.getLikes());
+            ps.setBoolean(5, user.isAdmin());
+            ps.setInt(6, user.getId());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }

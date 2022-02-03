@@ -1,8 +1,9 @@
-package main.utils.services;
+package main.model.utils.services.data;
 
-import main.data.Car;
-import main.data.ParkingSpace;
-import main.data.User;
+import main.model.data.Car;
+import main.model.data.ParkingOrder;
+import main.model.data.ParkingSpace;
+import main.model.data.User;
 
 public class ServiceFactory {
     public static AbstractService getService(Class<?> clazz) {
@@ -12,6 +13,8 @@ public class ServiceFactory {
             return new UserService();
         } else if (clazz == Car.class) {
             return new CarService();
+        } else if (clazz == ParkingOrder.class) {
+            return new ParkingOrderService();
         }
         return null;
     }

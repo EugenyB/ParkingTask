@@ -1,23 +1,27 @@
 package main.controller;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import main.data.Car;
-import main.data.ParkingOrder;
-import main.data.ParkingSpace;
-import main.data.User;
+
+import main.model.data.Car;
+import main.model.data.ParkingOrder;
+import main.model.data.ParkingSpace;
+import main.model.data.User;
+import main.model.data.adapter.ParkingOrderDTO;
 import main.model.ParkingData;
-import main.utils.services.*;
-import main.utils.StrategyFactory;
+import main.model.utils.services.LoginService;
+import main.model.utils.services.data.*;
+import main.model.utils.services.tabstrategy.StrategyFactory;
 import main.view.View;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public class Controller {
+
     @FXML
     private ListView<Car> registeredCarListView;
     @FXML
@@ -25,7 +29,15 @@ public class Controller {
     @FXML
     private ListView<ParkingSpace> mySpacesListView;
     @FXML
-    private TableView<ParkingOrder> myOrdersTableView;
+    private TableView<ParkingOrderDTO> myOrdersTableView;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> carColumn;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> spaceColumn;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> startColumn;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> endColumn;
     @FXML
     private Label userLabel;
     @FXML
@@ -66,6 +78,21 @@ public class Controller {
     private Tab opTab;
     @FXML
     private Tab adminTab;
+    @FXML
+    private Tab viewAllParkingTab;
+
+    @FXML
+    private TableView<ParkingOrderDTO> allParkingTableView;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> allParkingUser;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> allParkingCar;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> allParkingSpace;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> allParkingStart;
+    @FXML
+    private TableColumn<ParkingOrderDTO, String> allParkingEnd;
 
     private User user;
 
@@ -74,7 +101,9 @@ public class Controller {
     public void initialize() {
         opTab.setDisable(true);
         adminTab.setDisable(true);
+        viewAllParkingTab.setDisable(true);
         view = new View();
+        view.setUserLabel(userLabel);
         view.setSpaceListView(spacesListView);
         view.setUserTableForAdmin(userTableForAdmin);
         view.setCarListView(carListView);
@@ -86,7 +115,20 @@ public class Controller {
         userLoginColForAdmin.setCellValueFactory(new PropertyValueFactory<>("login"));
         userLikesColForAdmin.setCellValueFactory(new PropertyValueFactory<>("likes"));
 
-        userTableForAdmin.getSelectionModel().selectedItemProperty().addListener((o,oldV,newV)->view.updateCarListView());
+        view.setMyOrdersTableView(myOrdersTableView);
+        carColumn.setCellValueFactory(new PropertyValueFactory<>("car"));
+        spaceColumn.setCellValueFactory(new PropertyValueFactory<>("space"));
+        startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+
+        view.setAllParkingTableView(allParkingTableView);
+        allParkingCar.setCellValueFactory(new PropertyValueFactory<>("car"));
+        allParkingSpace.setCellValueFactory(new PropertyValueFactory<>("space"));
+        allParkingUser.setCellValueFactory(new PropertyValueFactory<>("user"));
+        allParkingStart.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        allParkingEnd.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+
+        userTableForAdmin.getSelectionModel().selectedItemProperty().addListener((o, oldV, newV) -> view.updateCarListView());
 
         view.addTextFields(nameFieldForNewUser, loginFieldForNewUser, passwordFieldForNewUser, markField, regNoField);
     }
@@ -96,7 +138,7 @@ public class Controller {
         Optional<User> optionalUser = loginService.login(loginField.getText().trim(), passwordField.getText().trim());
         if (optionalUser.isEmpty()) return;
         user = optionalUser.get();
-        userLabel.setText("User: " + user.getName());
+        //userLabel.setText("User: " + user.getName());
         ParkingData.getInstance().setUser(user);
         showTabs(StrategyFactory.getTabShowStrategy(user).tabNames());
     }
@@ -106,7 +148,7 @@ public class Controller {
         for (Tab tab : tabsToClose) {
             tabPane.getTabs().remove(tab);
         }
-        tabPane.getTabs().forEach(t->t.setDisable(false));
+        tabPane.getTabs().forEach(t -> t.setDisable(false));
         tabPane.getSelectionModel().select(0);
         StrategyFactory.getTabShowStrategy(user).fillTabs(view);
     }
@@ -173,5 +215,38 @@ public class Controller {
     public void clearUserSelection() {
         userTableForAdmin.getSelectionModel().clearSelection();
         view.update();
+    }
+
+    public void park() {
+        Car car = registeredCarListView.getSelectionModel().getSelectedItem();
+        if (car == null) return;
+        ParkingSpace parkingSpace = freeSpacesListView.getSelectionModel().getSelectedItem();
+        if (parkingSpace == null) return;
+        doPark(car, parkingSpace);
+    }
+
+    private void doPark(Car car, ParkingSpace parkingSpace) {
+        parkingSpace.setOccupied(car.getRegno());
+        addParkingOrder(car, parkingSpace);
+        view.update();
+    }
+
+    private void addParkingOrder(Car car, ParkingSpace parkingSpace) {
+        ParkingOrder p = new ParkingOrder(0, car, parkingSpace, LocalDateTime.now());
+        ServiceFactory.getService(ParkingOrder.class).persist(p);
+        ServiceFactory.getService(ParkingSpace.class).update(parkingSpace);
+    }
+
+    public void leave() {
+        ParkingSpace parkingSpace = mySpacesListView.getSelectionModel().getSelectedItem();
+        if (parkingSpace == null) return;
+        ParkingOrderService service = (ParkingOrderService) ServiceFactory.getService(ParkingOrder.class);
+        if (service.setFinishedBySpace(parkingSpace.getId())) {
+            parkingSpace.setOccupied("");
+            ServiceFactory.getService(ParkingSpace.class).update(parkingSpace);
+            user.setLikes(user.getLikes() + 1);
+            ServiceFactory.getService(User.class).update(user);
+            view.update();
+        }
     }
 }

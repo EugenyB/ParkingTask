@@ -1,8 +1,8 @@
-package main.utils.services;
+package main.model.utils.services.data;
 
-import main.data.Car;
-import main.data.User;
-import main.utils.DataBaseManager;
+import main.model.data.Car;
+import main.model.data.User;
+import main.model.utils.DataBaseManager;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +14,7 @@ public class CarService extends AbstractService {
     private static final String FIND_BY_ID = "select * from car where regno = ? limit 1";
     private static final String ADD_CAR = "insert into car values (?, ?, ?)";
     private static final String DELETE_CAR = "delete from car where regno = ?";
+    private static final String UPDATE_CAR_USER = "update car set user_id = ? where regno = ?";
 
     @Override
     public  List<Car> findAll() {
@@ -100,6 +101,19 @@ public class CarService extends AbstractService {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean update(Object o) {
+        Car c = (Car) o;
+        try (PreparedStatement ps = DataBaseManager.getInstance().getConnection().prepareStatement(UPDATE_CAR_USER)) {
+            ps.setInt(1, c.getOwner().getId());
+            ps.setString(2, c.getRegno());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
         }
     }
 }

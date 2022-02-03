@@ -1,6 +1,4 @@
-package main.utils.services;
-
-import main.data.Car;
+package main.model.utils.services.data;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,4 +15,6 @@ public abstract class AbstractService {
     public abstract boolean persist(Object o);
 
     public abstract void delete(Object o);
+
+    public abstract boolean update(Object o);
 }

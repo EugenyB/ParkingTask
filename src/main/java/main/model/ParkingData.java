@@ -2,7 +2,7 @@ package main.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import main.data.User;
+import main.model.data.User;
 
 public class ParkingData {
     private static ParkingData instance;

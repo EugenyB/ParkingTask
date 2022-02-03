@@ -1,6 +1,6 @@
-package main.utils;
+package main.model.utils.services.tabstrategy;
 
-import main.data.User;
+import main.model.data.User;
 
 public class StrategyFactory {
     public static TabShowStrategy getTabShowStrategy(User user) {

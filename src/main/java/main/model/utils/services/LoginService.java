@@ -1,7 +1,7 @@
-package main.utils.services;
+package main.model.utils.services;
 
-import main.data.User;
-import main.utils.DataBaseManager;
+import main.model.data.User;
+import main.model.utils.DataBaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

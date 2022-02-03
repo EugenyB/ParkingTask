@@ -1,4 +1,4 @@
-package main.data;
+package main.model.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +18,6 @@ public class ParkingSpace {
 
     @Override
     public String toString() {
-        return code + "   " + (occupied.isBlank() ? "(   )" : "( " + occupied.strip() + " )");
+        return code + "   " + (occupied == null || occupied.isBlank() ? "(   )" : "( " + occupied.strip() + " )");
     }
 }
