@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Main Controller for program with MVC Pattern
+ */
 public class Controller {
 
     @FXML
@@ -138,7 +141,6 @@ public class Controller {
         Optional<User> optionalUser = loginService.login(loginField.getText().trim(), passwordField.getText().trim());
         if (optionalUser.isEmpty()) return;
         user = optionalUser.get();
-        //userLabel.setText("User: " + user.getName());
         ParkingData.getInstance().setUser(user);
         showTabs(StrategyFactory.getTabShowStrategy(user).tabNames());
     }

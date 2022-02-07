@@ -8,9 +8,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Singleton, as only one Database connection must be
+ */
 public class DataBaseManager {
     private static DataBaseManager instance;
-    private Connection connection;
+    private final Connection connection;
 
     private DataBaseManager() {
         try (BufferedReader br = new BufferedReader(new FileReader("parking.props"))) {

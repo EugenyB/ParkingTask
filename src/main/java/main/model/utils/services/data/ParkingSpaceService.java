@@ -10,6 +10,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation AbstractService Strategy for parking_space table in database
+ */
 public class ParkingSpaceService extends AbstractService {
 
     private final String FIND_ALL_PLACES = "select * from parking_space";

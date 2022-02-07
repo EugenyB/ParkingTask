@@ -6,9 +6,11 @@ import main.model.data.ParkingOrder;
 
 import java.time.format.DateTimeFormatter;
 
+/** Adapter class for using with TableView where each column is single property (int or String but no other types)
+ *  Also implements Builder pattern with implementation from Project Lombok library
+ */
 @Data
 @Builder
-
 public class ParkingOrderDTO {
     private final static String FMT = "HH:mm dd-MMM-yyyy";
 

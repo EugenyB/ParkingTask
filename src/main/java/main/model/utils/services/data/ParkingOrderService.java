@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation AbstractService Strategy for parking_order table in database
+ */
 public class ParkingOrderService extends AbstractService {
     private static final String FIND_ALL = "select * from parking_order";
     private static final String FIND_BY_ID = "select * from parking_order where id = ? limit 1";
@@ -138,7 +141,6 @@ public class ParkingOrderService extends AbstractService {
                 }
                 return true;
             } else {
-                System.out.println("> not found order by space");
                 return false;
             }
         } catch (SQLException e) {

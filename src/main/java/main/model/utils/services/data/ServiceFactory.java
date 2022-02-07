@@ -5,8 +5,27 @@ import main.model.data.ParkingOrder;
 import main.model.data.ParkingSpace;
 import main.model.data.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Service Factory for work with data in database tables
+ * Also implement Flyweight pattern (Objects that factory produce stores in object cash and can be used many times)
+ */
 public class ServiceFactory {
+
+    private final static Map<Class<?>, AbstractService> serviceCash = new HashMap<>();
+
     public static AbstractService getService(Class<?> clazz) {
+        if (serviceCash.containsKey(clazz)) return serviceCash.get(clazz);
+        else {
+            AbstractService as = get(clazz);
+            if (as != null) serviceCash.put(clazz, as);
+            return as;
+        }
+    }
+
+    private static AbstractService get(Class<?> clazz) {
         if (clazz == ParkingSpace.class) {
             return new ParkingSpaceService();
         } else if (clazz == User.class) {

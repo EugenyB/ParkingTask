@@ -4,6 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import main.model.data.User;
 
+/**
+ * This class implements Singleton pattern
+ * contains Parking data about user.
+ * Can be used for storing some extra data
+ */
 public class ParkingData {
     private static ParkingData instance;
 

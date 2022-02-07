@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * Implementation AbstractService Strategy for car table in database
+ */
 public class CarService extends AbstractService {
     private static final String FIND_ALL = "select * from car";
     private static final String FIND_BY_ID = "select * from car where regno = ? limit 1";

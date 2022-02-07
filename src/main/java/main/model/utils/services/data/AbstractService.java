@@ -3,6 +3,9 @@ package main.model.utils.services.data;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Base class for Database operations. Strategy pattern
+ */
 public abstract class AbstractService {
     public abstract <T> List<T> findAll();
 

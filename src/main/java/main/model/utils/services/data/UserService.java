@@ -9,6 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation AbstractService Strategy for user table in database
+ */
 public class UserService extends AbstractService {
     private static final String ADD_USER = "insert into user (name, login, password, admin) values (?, ?, ?, ?)";
     private static final String FIND_ALL = "select * from user";

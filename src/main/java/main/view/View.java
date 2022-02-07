@@ -21,6 +21,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * View class for MVC pattern
+ */
 @Data
 public class View {
 
@@ -58,7 +61,6 @@ public class View {
         User user = ParkingData.getInstance().getUser();
         AbstractService service = ServiceFactory.getService(ParkingOrder.class);
         List<ParkingOrder> list = service.findByFK(user.getId());
-        System.out.println("list.size = " + list.size());
         myOrdersTableView.setItems(FXCollections.observableList(list.stream().map(ParkingOrderDTO::from).toList()));
     }
 
@@ -97,12 +99,10 @@ public class View {
     }
 
     private void updateUserTableForAdmin() {
-//        UserService us = (UserService) ServiceFactory.getService(User.class);
         userTableForAdmin.setItems(FXCollections.observableList(Objects.requireNonNull(ServiceFactory.getService(User.class)).findAll()));
     }
 
     private void updateSpaceListView() {
-//        ParkingSpaceService pss = (ParkingSpaceService) ServiceFactory.getService(ParkingSpace.class);
         spaceListView.setItems(FXCollections.observableList(Objects.requireNonNull(ServiceFactory.getService(ParkingSpace.class)).findAll()));
     }
 
